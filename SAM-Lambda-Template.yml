@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification template describing your function.
+Resources:
+  ochaTranformWHO:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: ochaTransformWHOFeed.transform_handler
+      Runtime: python3.7
+      CodeUri: .
+      Description: ''
+      MemorySize: 1024
+      Timeout: 60
+      Role: "arn:aws:iam::123301200831:role/LambdaS3FullAccess"
+      Events:
+        Schedule1:
+          Type: Schedule
+          Properties:
+            Schedule: rate(12 hours)
+      Environment:
+        Variables:
+          s3_bucketname: mike-awstest-data
+          s3_ocha_s3_folder: WHO/
+          s3_ocha_transformed_key: >-
+            Data_ WHO Coronavirus Covid-19 Cases and Deaths -
+            WHO-COVID-19-global-data.csv
+          temp_output_filename: output.csv
+          temp_output_filepath: /tmp/
+          table: data_who_covid19
+          who_feed_url: >-
+            https://services.arcgis.com/5T5nSi527N4F7luB/arcgis/rest/services/COVID19_hist_cases_adm0_v5_view/FeatureServer/0/query?outFields=*&where=1%3D1&f=json
+      Layers:
+        - 'arn:aws:lambda:eu-north-1:123301200831:layer:pandas-xlrd:2'
